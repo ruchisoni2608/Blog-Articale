@@ -1,0 +1,315 @@
+@extends('layout.main')
+
+@section('content')
+    <!-- Your dashboard content goes here -->
+    <div class="row">
+        <div class="edit-profile">
+            <div class="row">
+
+                <div class="col-xl-10">
+                        <div class="form-group">
+                            <label for="profilePhotoDropzone">Upload New Profile Photo</label>
+                            <div id="profilePhotoDropzone" class="dropzone"></div>
+                        </div>
+                    <form  action="{{ route('profile.update',$user->id) }}"
+                         method="post" enctype="multipart/form-data"  id="image-upload" class="dropzone">
+                        @csrf
+                        @method('PUT')
+                        <div class="card-header pb-0">
+                            <h4 class="card-title mb-0">Edit Profile</h4>
+                            <div class="card-options"><a class="card-options-collapse" href="#"
+                                    data-bs-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a><a
+                                    class="card-options-remove" href="#" data-bs-toggle="card-remove"><i
+                                        class="fe fe-x"></i></a></div>
+                        </div>
+                        <!-- Hidden input for user ID -->
+                        <input type="hidden" name="user_id" value="{{ $user->id }}">
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-6 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">First Name</label>
+                                        <input class="form-control" type="text" name="name"
+                                            value="{{ old('name', $user->name) }}">
+                                           
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Email address</label>
+                                        <input class="form-control" type="email" name="email"
+                                            value="{{ old('email', $user->email) }}">
+                                    </div>
+                                </div>
+
+
+                                <div class="col-sm-6 col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Designation</label>
+                                        <input class="form-control" type="text"
+                                            value="{{ old('designation', $user->designation) }}" name="designation">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+                                        <label class="form-label">Bio</label>
+
+                                        <textarea class="form-control" name="bio" rows="5">{{ old('bio', $user->bio) }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Website links</label>
+                                        <input class="form-control" type="text" name="website" id="website"
+                                            class="form-control" value="{{ old('website', $user->website) }}">
+                                    </div>
+                                </div>
+
+                                {{-- <div class="form-group">
+                                    <label for="profile_photo">Profile Photo</label>
+                                    <input type="hidden" name="profile_photo" id="profile_photo" class="form-control-file">
+                                    @if ($user->profile_photo)
+                                        <img src="{{ asset('storage/images/' . $user->profile_photo) }}"
+                                            alt="{{ $user->name }}'s Profile Photo" class="mt-2"
+                                            style="max-width: 200px;">
+                                    @endif
+                                    
+                                </div> --}}
+                           {{-- <div class="form-group">
+                            <label for="profile_photo">Profile Photo</label>
+                            <input type="hidden" name="profile_photo" id="profile_photo" class="form-control-file">
+                            @if ($user->profile_photo)
+                                <img src="{{ asset('storage/images/' . $user->profile_photo) }}"
+                                    alt="{{ $user->name }}'s Profile Photo" class="mt-2" style="max-width: 200px;">
+                            @endif
+                        </div>
+
+                        <div class="form-group">
+                            <label for="profilePhotoDropzone">Upload New Profile Photo</label>
+                            <div id="profilePhotoDropzone" class="dropzone"></div>
+                        </div> --}}
+                        {{-- <div class="col-xs-12 col-sm-12 col-md-12">
+                            <div class="form-group">
+                                <strong>Profile Photo:</strong>
+                                <input type="hidden" name="profile_photo" id="profile_photo" class="form-control-file">
+                                <div id="profilePhotoDropzone" class="dropzone"></div>
+                                @if ($user->profile_photo)
+                                    <img src="{{ asset('storage/images/' . $user->profile_photo) }}"
+                                        alt="{{ $user->name }}'s Profile Photo" class="mt-2" style="max-width: 200px;">
+                                @endif
+                            </div>
+                        </div> --}}
+
+
+                     
+                            </div>
+                        </div>
+                        <div class="card-footer text-end">
+                            <button class="btn btn-primary" id="submitBtn" type="submit">Update profile</button>
+                        </div>
+                        
+                    </form>
+                    <!-- Container-fluid Ends-->
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+@section('scripts')
+<script type="text/javascript">
+        Dropzone.options.imageUpload = {
+            maxFilesize         :       1,
+            acceptedFiles: ".jpeg,.jpg,.png,.gif"
+        };
+</script>
+{{-- <script>
+    Dropzone.autoDiscover = false;
+    $(document).ready(function() {
+      //  alert("11");
+        var profilePhotoDropzone = new Dropzone('#profilePhotoDropzone', {
+            autoProcessQueue: false,
+            url: "{{ route('profile.update', $user->id) }}", // Change this to your update route
+            paramName: "profile_photo",
+            acceptedFiles: 'image/*',
+            //maxFiles: 1, // Allow only one file
+            addRemoveLinks: true,
+            init: function() {
+                var existingProfilePhoto = "{{ $user->profile_photo }}";
+
+                if (existingProfilePhoto) {
+                    var mockFile = {
+                        name: existingProfilePhoto,
+                        size: 12345 // Replace with the actual file size
+                    };
+                    this.emit("addedfile", mockFile);
+                    this.emit("thumbnail", mockFile, "{{ asset('storage/images/') }}/" + existingProfilePhoto);
+                    this.emit("complete", mockFile);
+                }
+
+                this.on('sending', function(file, xhr, formData) {
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('_method', 'PUT');
+                });
+
+                this.on('success', function(file, response) {
+                    // Refresh the page or handle success action
+                    location.reload();
+                //     window.location.href = "{{ route('profile.show', $user->id) }}";
+                });
+
+            
+                this.on('removedfile', function(file) {
+                    var filename = file.name;
+                    var _token = '{{ csrf_token() }}';
+
+                    $.ajax({
+                        url: "{{ route('removeProfileImage') }}",
+                        method: 'POST',
+                        data: {
+                            _token: _token,
+                            filename: filename
+                        },
+                        success: function(response) {
+                            console.log(response);
+                        },
+                        error: function(error) {
+                            console.error(error);
+                        }
+                    });
+                });
+            }
+        });
+
+        $("#submitBtn").click(function(e) {
+            e.preventDefault();
+            profilePhotoDropzone.processQueue();
+        });
+    });
+</script> --}}
+{{-- 
+<script>
+    Dropzone.autoDiscover = false;
+
+    jQuery(document).ready(function($) {
+        var myDropzone = new Dropzone('#profilePhotoDropzone', {
+            autoProcessQueue: false,
+            url: "{{ route('profile.update', $user->id) }}",
+            paramName: "profile_photo",
+            acceptedFiles: 'image/*',
+            addRemoveLinks: true,
+            init: function() {
+                this.on('success', function(file, response) {
+                    window.location.href = "{{ route('profile.show', $user->id) }}";
+                });
+
+                this.on('addedfile', function(file) {
+                    this.processQueue(); // Start processing the queue manually when a file is added
+                    console.log('File added:', file);
+                });
+
+                this.on('queuecomplete', function() {
+                    console.log('Queue complete');
+                });
+
+                this.on('sending', function(file, xhr, formData) {
+                    formData.append('_token', '{{ csrf_token() }}');
+                    formData.append('_method', 'PUT');
+                    xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+                });
+
+                this.on('removedfile', function(file) {
+                    var filename = file.name;
+                    var _token = '{{ csrf_token() }}';
+
+                    $.ajax({
+                        url: "{{ route('removeProfileImage') }}",
+                        method: 'POST',
+                        data: {
+                            _token: _token,
+                            filename: filename
+                        },
+                        success: function(response) {
+                            console.log(response);
+                        },
+                        error: function(error) {
+                            console.error(error);
+                        }
+                    });
+                });
+            },
+        });
+
+        $("#submitBtn").click(function(e) {
+            e.preventDefault();
+            myDropzone.processQueue();
+        });
+    });
+</script> --}}
+
+{{-- 
+    <script>
+    Dropzone.autoDiscover = false;
+
+   jQuery(document).ready(function($) {
+        var myDropzone = new Dropzone('#profilePhotoDropzone', {
+               autoProcessQueue: false,
+            url: "{{ route('profile.update',$user->id) }}", // Change this to your update route
+            paramName: "profile_photo",
+            //maxFilesize: 2, // Set the maximum file size in MB
+            acceptedFiles: 'image/*', // Accept only image files
+            addRemoveLinks: true,
+            init: function() {
+                this.on('success', function(file, response) {
+             
+                    // Redirect to index page after successful submission
+                    window.location.href = "{{ route('profile.show',$user->id) }}";
+                });
+                  this.on('addedfile', function(file) {
+                        console.log('File added:', file);
+                    });
+
+                    this.on('queuecomplete', function() {
+                        console.log('Queue complete');
+                    });
+
+                this.on('sending', function(file, xhr, formData) {
+                  formData.append('_token', '{{ csrf_token() }}');
+                formData.append('_method', 'PUT');
+                xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}'); // Add this line
+        
+                });
+
+                this.on('removedfile', function(file) {
+                    var filename = file.name;
+                    var _token = '{{ csrf_token() }}';
+
+                    // Send an AJAX request to remove the image from the database
+                    $.ajax({
+                        url: "{{ route('removeProfileImage') }}", // Change to your route for removing images
+                        method: 'POST',
+                        data: {
+                            _token: _token,
+                            filename: filename
+                        },
+                        success: function(response) {
+                            console.log(response);
+                        },
+                        error: function(error) {
+                            console.error(error);
+                        }
+                    });
+                });
+            },
+        });
+
+        $("#submitBtn").click(function(e) {
+            e.preventDefault();
+            myDropzone.processQueue();
+        });
+    });
+</script> --}}
+
+@endsection
